@@ -1,0 +1,17 @@
+---
+- name: Deploy the laptop server
+  hosts: all
+  become: true
+  become_user: root
+  remote_user: "{{ ansible_user }}"
+  gather_facts: true
+
+  vars_files:
+      - defaults/vault.yml
+
+  vars:
+      ansible_sudo_pass: "{{ sudo_password }}"
+
+  roles:
+      - role: base
+        tags: base

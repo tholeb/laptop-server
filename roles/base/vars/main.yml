@@ -1,0 +1,5 @@
+---
+packages:
+    - fail2ban
+    - git
+    - build-essential

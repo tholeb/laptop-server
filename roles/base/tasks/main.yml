@@ -1,0 +1,36 @@
+---
+- name: Update the system
+  ansible.builtin.apt:
+      upgrade: true
+      update_cache: true
+      cache_valid_time: 86400
+
+- name: Install new packages
+  ansible.builtin.apt:
+      name: "{{ packages }}"
+      state: latest
+
+- name: Make a cron to update the system
+  ansible.builtin.cron:
+      name: update_apt
+      user: root
+      special_time: weekly
+      backup: true
+      job: "apt-get update -y; apt-get upgrade -y; apt-get autoremove -y"
+
+- name: "Start and enable fail2ban"
+  ansible.builtin.service:
+      name: "fail2ban"
+      state: restarted
+      enabled: true
+
+- name: Disable sleep mode on lid close
+  ansible.builtin.lineinfile:
+      path: /etc/systemd/logind.conf
+      regexp: "^#?HandleLidSwitch="
+      line: "HandleLidSwitch=lock"
+      state: present
+      backrefs: true
+      backup: true
+  notify:
+      - Restart systemd-login
